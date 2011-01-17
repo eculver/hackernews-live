@@ -60,7 +60,7 @@ var socket = io.listen(server);
 socket.on('connection', function(client){
     
     // New news callback/listener. Send it when we see it.
-    news_emitter.on('new_news', function(news) {
+    var handleNews = function(news) {
         sys.puts("sending message...");
         
         // Give the message a type, so the FE can act on various different
@@ -69,6 +69,13 @@ socket.on('connection', function(client){
                     news: news }
         
         client.send(message);
+    }
+    
+    news_emitter.on('new_news', handleNews);
+    
+    client.on('disconnect', function() {
+        sys.puts("client disconnected");
+        news_emitter.removeListener('new_news', handleNews)
     });
 });
 
