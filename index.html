@@ -1,0 +1,83 @@
+<!doctype html>  
+
+<!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ --> 
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en" class="no-js"><!--<![endif]-->
+<head>
+    <title>Hacker News Live</title>
+    
+    <meta charset="utf-8">
+    
+    <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame 
+       Remove this if you use the .htaccess -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title></title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+    
+    <!--  Mobile viewport optimized: j.mp/bplateviewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Place favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    
+    <!-- CSS : implied media="all" -->
+    <link rel="stylesheet" href="css/style.css?v=2">
+    
+    <!-- Uncomment if you are specifically targeting less enabled mobile browsers
+    <link rel="stylesheet" media="handheld" href="css/handheld.css?v=2">  -->
+    
+    <!-- All JavaScript at the bottom, except for Modernizr which enables HTML5 elements & feature detects -->
+    <script src="js/lib/modernizr-1.6.min.js"></script>
+</head>
+
+<body>
+    <div id="container">
+        <header>
+            <a id="logo" href="http://ycombinator.com" title="Home">
+                <img src="http://ycombinator.com/images/y18.gif" width="18" height="18">
+            </a>
+            <h1>Hacker News <em>Live</em></h1>
+        </header>
+        
+        <div id="main" role="main">
+            <ol id="messages">
+                <li id="loading"><h2>Loading News....</h2></li>
+            </ol>
+        </div>
+        
+        <footer>
+            An <a href="http://evanculver.com" title="Evan Culver">Evan Culver</a> production.
+            Code <a href="http://github.com/eculver/hackernews-live" title="Code at Github.com">here</a>.
+        </footer>
+    </div> <!--! end of #container -->
+    
+    <!-- Grab Google CDN's jQuery. fall back to local if necessary -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
+    <script>!window.jQuery && document.write(unescape('%3Cscript src="js/lib/jquery-1.4.4.js"%3E%3C/script%3E'))</script>
+    
+    <script src="js/lib/json.js"></script> <!-- for ie -->
+    <script src="js/lib/socket.io.js"></script>
+    <script src="js/lib/mustache.js"></script>
+    
+    <script src="js/plugins.js"></script>
+    <script src="js/script.js"></script>
+    
+    <!--[if lt IE 7 ]>
+    <script src="js/libs/dd_belatedpng.js"></script>
+    <script>DD_belatedPNG.fix('img, .png_bg'); // Fix any <img> or .png_bg bg-images. Also, please read goo.gl/mZiyb </script>
+    <![endif]-->
+    
+    <!-- mathiasbynens.be/notes/async-analytics-snippet Change UA-XXXXX-X to be your site's ID -->
+    <script>
+    var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;
+    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+</body>
+</html>
