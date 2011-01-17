@@ -4,7 +4,8 @@ Hackernews Live
 This is just a little toy project that uses `Node.js <http://nodejs.org/>`_, 
 `Socket.IO <http://socket.io/>`_ and the `unofficial Hacker News API 
 <http://api.ihackernews.com/>`_ with some look and feel inspiration from 
-`Comfy Hacker News <https://comfy-helvetica.jottit.com/>`_.
+`Comfy Hacker News <https://comfy-helvetica.jottit.com/>`_ to generate a 
+live view of the `hackernews homepage <http://news.ycombinator.com>`_
 
 The live demo can be seen at http://hnlive.evanculver.com/.
 
@@ -41,15 +42,14 @@ Running the code
 1. Pull the code down::
 
         git clone https://github.com/eculver/hackernews-live.git
-    
+
 2. Start the Node.js server::
 
         cd hackernews-live
         node bin/server.js
-    
+
 3. Visit the static markup in a browser:
 
     file:///path/to/hackernews-live/index.html
-    
 
 You should see an HN-like site, that updates itself automagically.
