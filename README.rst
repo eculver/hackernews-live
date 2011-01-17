@@ -31,7 +31,7 @@ Installing dependencies
 -----------------------
 
 Once you have node and npm installed, the only other dependencies are request
-and Socket.io::
+and Socket.IO::
 
     npm install request socket.io
 
