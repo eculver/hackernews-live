@@ -49,17 +49,28 @@ socket.on('connect', function(){
 
 // fired when client recieves a message.
 socket.on('message', function(message){
-    //console.log('message');
+    console.log('message');
+    console.log(message);
     
     // handle new news.
-    if(message.type == 'news' && message.news && message.news.length > 0) {
+    if(message.type == 'news' && message.news && message.news.items && message.news.items.length > 0) {
         // reset the messages container.
         $('#messages').html('');
         
         // iterate over news items.
-        message.news.forEach(function(item, idx, a) {
+        message.news.items.forEach(function(item, idx, a) {
             // use Mustache to generate the markup to append.
             $('#messages').append(Mustache.to_html(templates.news_item, item));
+        });
+        
+        // animate 'dirty' indexes
+        message.news.dirty.forEach(function(item, idx, a) {
+            console.log("animating item " + item);
+            
+            // highlight effect by adjusting opacity
+            $('#messages li:eq('+item+')').animate({opacity: 0}, 200, function() {
+                $(this).animate({opacity: 1}, 200, function() {});
+            });
         });
     }
 });

@@ -11,10 +11,13 @@ var fs = require('fs'),
 var news_emitter = new events.EventEmitter();
 
 // how often to ask for more news from HN, in milliseconds.
-var POLL_INTERVAL = 10000; 
+var POLL_INTERVAL = 3000;
 
-// our news object that we'll diff against
-var shared_news_obj = [];
+// our news object that we'll diff against.
+var shared_news_obj = {
+    items: [],
+    dirty: []
+};
 
 // grabs news from unofficial HN API (http://api.ihackernews.com)
 // and fires the 'new_news' event.
@@ -24,11 +27,41 @@ function get_news() {
         if (!error && response.statusCode == 200) {
             var news_obj = JSON.parse(data);
             if(news_obj.items && news_obj.items.length > 0) {
-                // TODO: diff the two to see if anything new has shown up as
-                // opposed to just firing the event blindly.
-                
                 sys.puts("found some news!");
-                news_emitter.emit('new_news', news_obj.items);
+                
+                // first time fetching news
+                if(shared_news_obj.items.length == 0) {
+                    sys.puts("emitting 'new_news' on initial data seek'");
+                    shared_news_obj = news_obj;
+                    shared_news_obj.dirty = [];
+                    news_emitter.emit('new_news', shared_news_obj);
+                }
+                
+                else {
+                    // for testing diff and animation
+                    //shared_news_obj.items[0].commentCount = 25;
+                    //shared_news_obj.dirty[0] = 5; // fifth list element will be animated.
+                    
+                    // iterate over items to see if a descrpancy exists.
+                    shared_news_obj.items.forEach(function(v, idx, a) {
+                        // handle descrepancy.
+                        // important fields: id, points, postedAgo, commentCount
+                        if(v.id != news_obj.items[idx].id ||
+                           v.points != news_obj.items[idx].points ||
+                           v.postedAgo != news_obj.items[idx].postedAgo ||
+                           v.commentCount != news_obj.items[idx].commentCount) {
+                            shared_news_obj.items[idx] = news_obj.items[idx];
+                            shared_news_obj.dirty.push(idx);
+                        }
+                    });
+                    
+                    // only emit an event when the list is 'dirty'
+                    if(shared_news_obj.dirty.length > 0) {
+                        sys.puts("emitting 'new_news' due to dirty list");
+                        news_emitter.emit('new_news', shared_news_obj);
+                        shared_news_obj.dirty = [];
+                    }
+                }
             }
             else {
                 sys.puts("couldn't find news :(");
@@ -56,6 +89,15 @@ server.listen(8080);
 var socket = io.listen(server); 
 
 socket.on('connection', function(client){
+    
+    // if we have some news to give already, send it along immediately upon
+    // connection instantiation.
+    if(shared_news_obj.items.length > 0) {
+        message = { type: 'news',
+                    news: shared_news_obj }
+                    
+        client.send(message);
+    }
     
     // New news callback/listener. Send it when we see it.
     var handleNews = function(news) {
