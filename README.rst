@@ -14,7 +14,7 @@ Running the site yourself
 
 I developed the code against:
 
-Node.js v0.3.1
+Node.js v0.2.6
 
 Socket.IO v0.6.8
 
