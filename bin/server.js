@@ -80,7 +80,7 @@ setInterval(get_news, POLL_INTERVAL);
 server = http.createServer(function(req, res){ 
     res.writeHeader(200, {'Content-Type': 'text/html'}); 
     res.write('<h1>I Speak Websocket!</h1>'); 
-    res.finish();
+    res.close();
 });
 
 server.listen(8080);
