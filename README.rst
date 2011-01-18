@@ -25,7 +25,7 @@ installed at the time of development.
 
 Make sure you have `Node.js <http://nodejs.org/>`_ and `npm 
 <http://npmjs.org/>`_ installed. If you don't, see `this gist 
-<https://gist.github.com/661852>`_ on getting up and running quckly.
+<https://gist.github.com/661852>`_ on getting up and running quickly.
 
 Installing dependencies
 -----------------------
