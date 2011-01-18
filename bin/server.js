@@ -4,7 +4,7 @@ var fs = require('fs'),
     sys = require('sys'),
     http = require('http'),
     io = require('socket.io'),
-    events = require('events');
+    events = require('events'),
     request = require('request');
 
 // this will spit out events when new news arrives.
