@@ -6,7 +6,6 @@ var fs = require('fs'),
     io = require('socket.io'),
     events = require('events');
     request = require('request');
-    //express = require('express');
 
 // this will spit out events when new news arrives.
 var news_emitter = new events.EventEmitter();
