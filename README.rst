@@ -1,13 +1,14 @@
 Hackernews Live
 ===============
 
-This is just a little toy project that uses `Node.js <http://nodejs.org/>`_, 
-`Socket.IO <http://socket.io/>`_ and the `unofficial Hacker News API 
-<http://api.ihackernews.com/>`_ with some look and feel inspiration from 
-`Comfy Hacker News <https://comfy-helvetica.jottit.com/>`_ to generate a 
-live view of the `hackernews homepage <http://news.ycombinator.com>`_.
+This is just a little toy project that uses `Node.js <http://nodejs.org/>`_,
+`Socket.IO <http://socket.io/>`_,
+`node-scraper <https://github.com/mape/node-scraper`_ with some look and feel
+inspiration from `Comfy Hacker News <https://comfy-helvetica.jottit.com/>`_
+to generate a live view of the
+`hackernews homepage <http://news.ycombinator.com>`_.
 
-The live demo can be seen at http://hnlive.evanculver.com/.
+A live demo can be seen at http://hnlive.evanculver.com/.
 
 Running the site yourself
 =========================
