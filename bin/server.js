@@ -5,36 +5,111 @@ var fs = require('fs'),
     http = require('http'),
     io = require('socket.io'),
     events = require('events'),
-    request = require('request');
+    scraper = require('scraper');
 
 // this will spit out events when new news arrives.
-var news_emitter = new events.EventEmitter();
+var newsEmitter = new events.EventEmitter();
 
 // how often to ask for more news from HN, in milliseconds.
 var POLL_INTERVAL = 3000;
 
 // our news object that we'll diff against.
-var shared_news_obj = {
+var sharedNewsObj = {
     items: [],
     dirty: []
 };
 
 // grabs news from unofficial HN API (http://api.ihackernews.com)
 // and fires the 'new_news' event.
-function get_news() {
+function getNews() {
     sys.puts("fetching news...");
-    request({uri:'http://api.ihackernews.com/page'}, function (error, response, data) {
-        if (!error && response.statusCode == 200) {
-            var news_obj = JSON.parse(data);
-            if(news_obj.items && news_obj.items.length > 0) {
+    
+    //request({uri:'http://news.ycombinator.com'}, function(error, response, data) {
+    scraper('http://news.ycombinator.com', function(error, $) {
+        //if (!error && response.statusCode == 200) {
+        if(!error) {
+            
+            // parse document to extract what we need.
+            var titles_e = $('table table:eq(1) td.title a');
+            var titles = [];
+            titles_e.each(function() {
+                var url = $(this).attr('href');
+                var title = $(this).text();
+                titles.push({
+                    url: url,
+                    title: title
+                });
+            });
+            
+            // remove last item
+            titles.splice(titles.length - 1, 1);
+            
+            var details_e = $('table table:eq(1) td.subtext');
+            var details = [];
+            details_e.each(function() {
+                var detailsTokens = $(this).text().split(' ');
+                if(detailsTokens.length > 9) {
+                    var id = $(this).find('a:eq(1)').attr('href').replace('item?id=', '');
+                    var points = detailsTokens[0];
+                    var postedBy = detailsTokens[3];
+                    var postedAgo = detailsTokens[4] + ' ' + detailsTokens[5] + ' ' + detailsTokens[6];
+                    
+                    // comment count is 0 when only 10 tokens present
+                    var commentCount = detailsTokens.length == 10 ? 0 : detailsTokens[9];
+                    
+                    details.push({
+                        id: id,
+                        points: points,
+                        postedBy: postedBy,
+                        postedAgo: postedAgo,
+                        commentCount: commentCount
+                    });
+                }
+                
+                else {
+                    sys.puts("could not parse details :(");
+                }
+            });
+            
+            
+            // merge the two (titles and details into one final object)
+            newsObj = { items: [] }
+            if(titles.length == details.length) {
+                for(var i=0; i<titles.length; i++) {
+                    newsObj.items.push({
+                        id: details[i].id,
+                        url: titles[i].url,
+                        title: titles[i].title,
+                        points: details[i].points,
+                        postedBy: details[i].postedBy,
+                        postedAgo: details[i].postedAgo,
+                        commentCount: details[i].commentCount
+                    });
+                }
+            }
+            
+            
+            //sys.puts("titles: " + titles.length);
+            //sys.puts("details: " + details.length);
+            
+            /*
+            var window = jsdom.jsdom(data).createWindow();
+            jsdom.jQueryify(window, '../js/lib/jquery-1.4.4.js', function() {
+                // jquery is now loaded on the jsdom window created from 'data'
+                var itemTable = window.$('table table tr');
+                //sys.puts("rows: " + itemTable.length);
+            });
+            */
+            //var newsObj = JSON.parse(data);
+            if(newsObj.items && newsObj.items.length > 0) {
                 sys.puts("found some news!");
                 
                 // first time fetching news
-                if(shared_news_obj.items.length == 0) {
+                if(sharedNewsObj.items.length == 0) {
                     sys.puts("emitting 'new_news' on initial data seek'");
-                    shared_news_obj = news_obj;
-                    shared_news_obj.dirty = [];
-                    news_emitter.emit('new_news', shared_news_obj);
+                    sharedNewsObj = newsObj;
+                    sharedNewsObj.dirty = [];
+                    newsEmitter.emit('new_news', sharedNewsObj);
                 }
                 
                 else {
@@ -43,26 +118,28 @@ function get_news() {
                     //shared_news_obj.dirty[0] = 5; // fifth list element will be animated.
                     
                     // iterate over items to see if a descrpancy exists.
-                    shared_news_obj.items.forEach(function(v, idx, a) {
+                    sharedNewsObj.items.forEach(function(v, idx, a) {
                         // handle descrepancy.
                         // important fields: id, points, postedAgo, commentCount
-                        if(v.id != news_obj.items[idx].id ||
-                           v.points != news_obj.items[idx].points ||
-                           v.postedAgo != news_obj.items[idx].postedAgo ||
-                           v.commentCount != news_obj.items[idx].commentCount) {
-                            shared_news_obj.items[idx] = news_obj.items[idx];
-                            shared_news_obj.dirty.push(idx);
+                        if(v.id != newsObj.items[idx].id ||
+                           v.points != newsObj.items[idx].points ||
+                           v.postedAgo != newsObj.items[idx].postedAgo ||
+                           v.commentCount != newsObj.items[idx].commentCount) {
+                            sharedNewsObj.items[idx] = newsObj.items[idx];
+                            sharedNewsObj.dirty.push(idx);
                         }
                     });
                     
                     // only emit an event when the list is 'dirty'
-                    if(shared_news_obj.dirty.length > 0) {
+                    if(sharedNewsObj.dirty.length > 0) {
                         sys.puts("emitting 'new_news' due to dirty list");
-                        news_emitter.emit('new_news', shared_news_obj);
-                        shared_news_obj.dirty = [];
+                        newsEmitter.emit('new_news', sharedNewsObj);
+                        sharedNewsObj.dirty = [];
                     }
                 }
+            
             }
+            
             else {
                 sys.puts("couldn't find news :(");
             }
@@ -71,8 +148,8 @@ function get_news() {
 }
 
 // Get an initial bunch of news and start the news poller.
-get_news();
-setInterval(get_news, POLL_INTERVAL);
+getNews();
+setInterval(getNews, POLL_INTERVAL);
 
 /* 
  *  Service setup
@@ -92,9 +169,9 @@ socket.on('connection', function(client){
     
     // if we have some news to give already, send it along immediately upon
     // connection instantiation.
-    if(shared_news_obj.items.length > 0) {
+    if(sharedNewsObj.items.length > 0) {
         message = { type: 'news',
-                    news: shared_news_obj }
+                    news: sharedNewsObj }
                     
         client.send(message);
     }
@@ -111,11 +188,11 @@ socket.on('connection', function(client){
         client.send(message);
     }
     
-    news_emitter.on('new_news', handleNews);
+    newsEmitter.on('new_news', handleNews);
     
     client.on('disconnect', function() {
         sys.puts("client disconnected");
-        news_emitter.removeListener('new_news', handleNews)
+        newsEmitter.removeListener('new_news', handleNews)
     });
 });
 

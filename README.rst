@@ -18,7 +18,7 @@ Node.js v0.2.6
 
 Socket.IO v0.6.8
 
-request v0.10.0
+scraper v0.0.6
 
 It'll probably work against older versions, but this is just what I had
 installed at the time of development.
@@ -33,7 +33,7 @@ Installing dependencies
 Once you have node and npm installed, the only other dependencies are request
 and Socket.IO::
 
-    npm install request socket.io
+    npm install scraper socket.io
 
 
 Running the code
