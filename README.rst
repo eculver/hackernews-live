@@ -2,11 +2,11 @@ Hackernews Live
 ===============
 
 This is just a little toy project that uses `Node.js <http://nodejs.org/>`_,
-`Socket.IO <http://socket.io/>`_,
-`node-scraper <https://github.com/mape/node-scraper/>`_ with some look and feel
-inspiration from `Comfy Hacker News <https://comfy-helvetica.jottit.com/>`_
-to generate a live view of the
-`hackernews homepage <http://news.ycombinator.com/>`_.
+`Socket.IO <http://socket.io/>`_, and `node-scraper 
+<https://github.com/mape/node-scraper/>`_ to generate a live view of the
+`hackernews homepage <http://news.ycombinator.com/>`_. The look and feel was
+inspired by the `Comfy Hacker News <https://comfy-helvetica.jottit.com/>`_ 
+Hackernews stylesheet.
 
 A live demo can be seen at http://hnlive.evanculver.com/.
 
