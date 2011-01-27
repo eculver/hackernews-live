@@ -113,6 +113,9 @@ function getNews() {
                 }
                 */
                 
+                // parse the response
+                var newsObj = JSON.parse(body);
+                
                 if(newsObj.items && newsObj.items.length > 0) {
                     sys.puts("found some news!");
                     
