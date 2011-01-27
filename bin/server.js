@@ -5,7 +5,8 @@ var fs = require('fs'),
     http = require('http'),
     io = require('socket.io'),
     events = require('events'),
-    scraper = require('scraper');
+    scraper = require('scraper'),
+    daemon_tools = require('daemon-tools');
 
 // this will spit out events when new news arrives.
 var newsEmitter = new events.EventEmitter();
@@ -19,12 +20,27 @@ var sharedNewsObj = {
     dirty: []
 };
 
-// grabs news from unofficial HN API (http://api.ihackernews.com)
-// and fires the 'new_news' event.
+var daemonConfig = {
+    lockFile: '/tmp/hnlive-server.pid'
+}
+
+// make this service a daemon
+dPID = daemon_tools.start(false);
+daemon_tools.lock(daemonConfig.lockFile);
+daemon_tools.closeIO();
+
+// prints V8 memory usage in KB
+function printMemoryUsage() {
+    stats = process.memoryUsage();
+    inKb = stats.heapUsed / 1024;
+    sys.puts("Heap Used: " + inKb.toFixed(2) + " KB");
+}
+
+// grabs news from HN homepage and fires the 'new_news' event if a diff has
+// been detected.
 function getNews() {
     sys.puts("fetching news...");
     
-    //request({uri:'http://news.ycombinator.com'}, function(error, response, data) {
     scraper('http://news.ycombinator.com', function(error, $) {
         try {
             if(!error) {
@@ -71,7 +87,7 @@ function getNews() {
                 });
                 
                 // merge the two (titles and details into one final object)
-                newsObj = { items: [] }
+                var newsObj = { items: [] }
                 if(titles.length == details.length) {
                     for(var i=0; i<titles.length; i++) {
                         newsObj.items.push({
@@ -139,10 +155,13 @@ function getNews() {
 getNews();
 setInterval(getNews, POLL_INTERVAL);
 
+// DEBUG: printing memory usage
+//setInterval(printMemoryUsage, 2000);
+
 /* 
  *  Service setup
  */ 
-server = http.createServer(function(req, res){
+var server = http.createServer(function(req, res){
     try {
         res.writeHead(200, {'Content-Type': 'text/html'});
         res.write('<h1>I Speak Websocket!</h1>');
@@ -158,13 +177,13 @@ server.listen(8080);
 // Websocket via socket.io 
 var socket = io.listen(server); 
 
-socket.on('connection', function(client){
+socket.on('connection', function(client) {
     // if we have some news to give already, send it along immediately upon
     // connection instantiation.
     if(sharedNewsObj.items.length > 0) {
-        message = { type: 'news',
-                    news: sharedNewsObj }
-                    
+        var message = { type: 'news',
+                        news: sharedNewsObj }
+        
         client.send(message);
     }
     
@@ -173,9 +192,9 @@ socket.on('connection', function(client){
         try {
             // give the message a type, so the FE can act on various different
             // messages should the need arise.
-            message = { type: 'news',
-                        news: news }
-        
+            var message = { type: 'news',
+                            news: news }
+            
             client.send(message);
         }
         catch(e) {
