@@ -5,7 +5,8 @@ var fs = require('fs'),
     http = require('http'),
     io = require('socket.io'),
     events = require('events'),
-    scraper = require('scraper'),
+    //scraper = require('scraper'),
+    request = require('request'),
     daemon_tools = require('daemon-tools');
 
 // this will spit out events when new news arrives.
@@ -25,9 +26,9 @@ var daemonConfig = {
 }
 
 // make this service a daemon
-dPID = daemon_tools.start(false);
-daemon_tools.lock(daemonConfig.lockFile);
-daemon_tools.closeIO();
+//dPID = daemon_tools.start(false);
+//daemon_tools.lock(daemonConfig.lockFile);
+//daemon_tools.closeIO();
 
 // prints V8 memory usage in KB
 function printMemoryUsage() {
@@ -36,14 +37,23 @@ function printMemoryUsage() {
     sys.puts("Heap Used: " + inKb.toFixed(2) + " KB");
 }
 
-// grabs news from HN homepage and fires the 'new_news' event if a diff has
+// grabs news from the HN API and fires the 'new_news' event if a diff has
 // been detected.
 function getNews() {
     sys.puts("fetching news...");
     
-    scraper('http://news.ycombinator.com', function(error, $) {
+    //scraper('http://news.ycombinator.com', function(error, $) {
+    request({uri:'http://api.ihackernews.com/page'}, function(error, response, body) {
         try {
-            if(!error) {
+            if(!error && response.statusCode == 200) {
+                
+                
+                /*
+                 *  Use this commented out piece when scraping to build an
+                 *  object similar to what the HN API returns.
+                 */
+                
+                /*
                 // parse document to extract what we need.
                 var titles_e = $('table table:eq(1) td.title a');
                 var titles = [];
@@ -101,6 +111,7 @@ function getNews() {
                         });
                     }
                 }
+                */
                 
                 if(newsObj.items && newsObj.items.length > 0) {
                     sys.puts("found some news!");
