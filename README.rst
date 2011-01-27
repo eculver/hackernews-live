@@ -2,8 +2,8 @@ Hackernews Live
 ===============
 
 This is just a little toy project that uses `Node.js <http://nodejs.org/>`_,
-`Socket.IO <http://socket.io/>`_, and `node-scraper 
-<https://github.com/mape/node-scraper/>`_ to generate a live view of the
+`Socket.IO <http://socket.io/>`_, and `the unofficial API for Y Combinator's
+HackerNews <http://api.ihackernews.com>`_ to generate a live view of the
 `hackernews homepage <http://news.ycombinator.com/>`_. The look and feel was
 inspired by the `Comfy Hacker News <https://comfy-helvetica.jottit.com/>`_ 
 Hackernews stylesheet.
@@ -19,7 +19,7 @@ Node.js v0.2.6
 
 Socket.IO v0.6.8
 
-scraper v0.0.6
+request v1.1.1
 
 It'll probably work against older versions, but this is just what I had
 installed at the time of development.
@@ -34,7 +34,7 @@ Installing dependencies
 Once you have node and npm installed, the only other dependencies are request
 and Socket.IO::
 
-    npm install scraper socket.io
+    npm install request socket.io
 
 
 Running the code
